@@ -87,9 +87,6 @@ def training(epochs, model, train_loader, val_loader, opt_func=torch.optim.Adam)
         for batch in train_loader:
             batch=to_device(batch,device)
             batch = batch.view(len(batch), -1)
-            print(type(batch))
-            print(len(batch))
-            print(batch[0].shape)
             
             #Train AE1
             loss1,loss2 = model.training_step(batch,epoch+1)
