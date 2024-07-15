@@ -30,8 +30,8 @@ class KukaDataset(Dataset):
             for el in kuka_ts:
                 el['time'] = pd.to_datetime(el['time'])
                 el.sort_values(by=['time'], inplace=True) # sort by time             
-                for start in range(len(el) - 100 + 1):
-                    window_df = el.iloc[start:start + 100]
+                for start in range(len(el) - 12 + 1):
+                    window_df = el.iloc[start:start + 12]
                     self.kuka_df.append(window_df)
         
         if verbose: print('files were read...')
