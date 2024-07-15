@@ -35,7 +35,7 @@ class KukaDataset(Dataset):
                     self.kuka_df.append(window_df)
         
         if verbose: print('files were read...')
-        self.kuka_df = self.kuka_df[:15000] #temporarely cutting it to test faster
+        self.kuka_df = self.kuka_df[:150000] #temporarely cutting it to test faster
 
         # add column for risk
         for window in self.kuka_df:
