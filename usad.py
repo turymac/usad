@@ -76,7 +76,7 @@ class UsadModel(nn.Module):
     print("Epoch [{}], val_loss1: {:.4f}, val_loss2: {:.4f}".format(epoch, result['val_loss1'], result['val_loss2']))
     
 def evaluate(model, val_loader, n):
-    outputs = [model.validation_step(to_device(batch,device), n) for [batch] in val_loader]
+    outputs = [model.validation_step(to_device(batch.view(len(batch), -1),device), n) for batch in val_loader]
     return model.validation_epoch_end(outputs)
 
 def training(epochs, model, train_loader, val_loader, opt_func=torch.optim.Adam):
@@ -84,8 +84,12 @@ def training(epochs, model, train_loader, val_loader, opt_func=torch.optim.Adam)
     optimizer1 = opt_func(list(model.encoder.parameters())+list(model.decoder1.parameters()))
     optimizer2 = opt_func(list(model.encoder.parameters())+list(model.decoder2.parameters()))
     for epoch in range(epochs):
-        for [batch] in train_loader:
+        for batch in train_loader:
             batch=to_device(batch,device)
+            batch = batch.view(len(batch), -1)
+            print(type(batch))
+            print(len(batch))
+            print(batch[0].shape)
             
             #Train AE1
             loss1,loss2 = model.training_step(batch,epoch+1)
@@ -109,8 +113,9 @@ def training(epochs, model, train_loader, val_loader, opt_func=torch.optim.Adam)
 def testing(model, test_loader, alpha=.5, beta=.5):
     results=[]
     with torch.no_grad():
-        for [batch] in test_loader:
+        for batch in test_loader:
             batch=to_device(batch,device)
+            batch = batch.view(len(batch), -1)
             w1=model.decoder1(model.encoder(batch))
             w2=model.decoder2(model.encoder(w1))
             results.append(alpha*torch.mean((batch-w1)**2,axis=1)+beta*torch.mean((batch-w2)**2,axis=1))

@@ -30,8 +30,8 @@ class KukaDataset(Dataset):
             for el in kuka_ts:
                 el['time'] = pd.to_datetime(el['time'])
                 el.sort_values(by=['time'], inplace=True) # sort by time             
-                for start in range(len(el) - config['trainer_params']['input_length'] + 1):
-                    window_df = el.iloc[start:start + config['trainer_params']['input_length']]
+                for start in range(len(el) - 100 + 1):
+                    window_df = el.iloc[start:start + 100]
                     self.kuka_df.append(window_df)
         
         if verbose: print('files were read...')
@@ -159,7 +159,7 @@ class KukaDataset(Dataset):
             labels = np.empty((len(time_series),3))
             labels.fill(np.nan)
 
-        if self.time_first: return torch.Tensor(time_series.values) , torch.Tensor(labels)
+        if self.time_first: return torch.Tensor(time_series.values) #, torch.Tensor(labels)
         return torch.transpose(torch.Tensor(time_series.values), 1, 0) , torch.transpose(torch.Tensor(labels), 1, 0)
     
     @staticmethod
@@ -187,4 +187,4 @@ class KukaDataset(Dataset):
         #    labels_alligned[i, :, max_len - (window_offset - max(0,window_offset - max_len)):] = labels[i][:,max(0,window_offset - max_len):window_offset]
         #    # set 1 where meaningful values
         #    mask[i,:window_offset] = 1
-        return data, labels # data_alligned, labels_alligned
+        return data#, labels # data_alligned, labels_alligned
