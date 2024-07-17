@@ -93,7 +93,7 @@ def get_args():
                         type=int,
                         help="number of epochs")
 
-    parser.add_argument("--hidden size",
+    parser.add_argument("--hidden_size",
                         default=50,
                         type=int,
                         help="dim of encoder hidden state")                        
@@ -178,12 +178,12 @@ def train_and_eval(args) :
 
     # window_size=6
 
-    windows_normal=normal.values[np.arange(arg.window_len)[None, :] + np.arange(normal.shape[0]-arg.window_len +1)[:, None]]
+    windows_normal=normal.values[np.arange(args.window_len)[None, :] + np.arange(normal.shape[0]-args.window_len +1)[:, None]]
     
     if args.verbose:
       print(f"Training windows shape: {windows_normal.shape}")
 
-    windows_attack = np.array([attack[i:i + arg.window_len] for i in range(len(attack) - arg.window_len + 1)])
+    windows_attack = np.array([attack[i:i + args.window_len] for i in range(len(attack) - args.window_len + 1)])
     windows_attack.shape
 
     if args.verbose:
@@ -229,7 +229,7 @@ def train_and_eval(args) :
         torch.from_numpy(windows_attack).float().view(([windows_attack.shape[0],w_size]))
     ) , batch_size=args.batch, shuffle=False, num_workers=0)
 
-    model = UsadModel(w_size, z_size, args.epochs)
+    model = UsadModel(w_size, z_size)
     model = to_device(model,device)
 
     history = training(args.epochs,model,train_loader,val_loader)
